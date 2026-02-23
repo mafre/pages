@@ -1,20 +1,17 @@
 // lib/kuromoji.ts
-import path from "node:path";
 import kuromoji from "kuromoji";
+import path from "path";
 
 export type KToken = kuromoji.IpadicFeatures;
 
-let tokenizerPromise: Promise<kuromoji.Tokenizer<KToken>> | null = null;
+const DIC_DIR = path.join(process.cwd(), "public", "dict");
 
-export function getDictPath(): string {
-  // Uses the dict shipped in node_modules/kuromoji/dict
-  return path.join(process.cwd(), "node_modules", "kuromoji", "dict");
-}
+let tokenizerPromise: Promise<kuromoji.Tokenizer<KToken>> | null = null;
 
 export async function getTokenizer() {
   if (!tokenizerPromise) {
     tokenizerPromise = new Promise((resolve, reject) => {
-      kuromoji.builder({ dicPath: getDictPath() }).build((err, tokenizer) => {
+      kuromoji.builder({ dicPath: DIC_DIR }).build((err, tokenizer) => {
         if (err || !tokenizer)
           reject(err ?? new Error("Tokenizer build failed"));
         else resolve(tokenizer);

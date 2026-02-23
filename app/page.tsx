@@ -106,6 +106,7 @@ export default function Page() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: input }),
       });
+
       const data = (await res.json()) as {
         tokens: ApiToken[];
         fullTextTranslation?: string;
@@ -117,17 +118,11 @@ export default function Page() {
       setTokens(tokensWithRomanized);
       setFullTextTranslation(data.fullTextTranslation ?? "");
       setSelected(new Set(tokensWithRomanized?.map((_, i) => i) ?? []));
+    } catch (error) {
+      console.error("Error fetching tokens:", error);
     } finally {
       setLoading(false);
     }
-  }
-
-  function toggle(i: number) {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      next.has(i) ? next.delete(i) : next.add(i);
-      return next;
-    });
   }
 
   return (
