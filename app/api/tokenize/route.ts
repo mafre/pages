@@ -71,3 +71,11 @@ export async function POST(req: Request) {
     { status: 200 },
   );
 }
+
+// Explicitly handle GET and other unsupported methods
+export async function GET() {
+  return new NextResponse("Method Not Allowed", {
+    status: 405,
+    headers: { Allow: "POST" },
+  });
+}
