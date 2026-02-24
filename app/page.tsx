@@ -1,8 +1,13 @@
 // app/page.tsx
 "use client";
 
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import * as hepburn from "hepburn";
+import { Sawarabi_Mincho } from "next/font/google";
+
+const sawarabiMincho = Sawarabi_Mincho({
+  weight: "400",
+});
 
 type ApiToken = {
   surface: string;
@@ -13,6 +18,7 @@ type ApiToken = {
   pos1?: string;
   pos2?: string;
   pos3?: string;
+  translation?: string;
 };
 
 type ApiTokenWithRomanized = ApiToken & {
@@ -43,17 +49,65 @@ export default function Page() {
 
   // Example data
   const exampleTokens: ApiToken[] = [
-    { surface: "この", base: "この", reading: "コノ", pos: "接触詞" },
-    { surface: "サイト", base: "サイト", reading: "サイト", pos: "名詞" },
-    { surface: "で", base: "で", reading: "デ", pos: "助詞" },
-    { surface: "日本語", base: "日本語", reading: "ニホンゴ", pos: "名詞" },
-    { surface: "を", base: "を", reading: "ヲ", pos: "助詞" },
-    { surface: "分析", base: "分析", reading: "ブンセキ", pos: "名詞" },
-    { surface: "・", base: "・", reading: "・", pos: "記号" },
-    { surface: "翻訳", base: "翻訳", reading: "ホンヤク", pos: "名詞" },
-    { surface: "でき", base: "できる", reading: "デキ", pos: "動詞" },
-    { surface: "ます", base: "ます", reading: "マス", pos: "助動詞" },
-    { surface: "。", base: "。", reading: "。", pos: "記号" },
+    {
+      surface: "この",
+      base: "この",
+      reading: "コノ",
+      pos: "接触詞",
+      translation: "this",
+    },
+    {
+      surface: "サイト",
+      base: "サイト",
+      reading: "サイト",
+      pos: "名詞",
+      translation: "site",
+    },
+    {
+      surface: "で",
+      base: "で",
+      reading: "デ",
+      pos: "助詞",
+      translation: "in",
+    },
+    {
+      surface: "日本語",
+      base: "日本語",
+      reading: "ニホンゴ",
+      pos: "名詞",
+      translation: "Japanese",
+    },
+    { surface: "を", base: "を", reading: "ヲ", pos: "助詞", translation: "" },
+    {
+      surface: "分析",
+      base: "分析",
+      reading: "ブンセキ",
+      pos: "名詞",
+      translation: "analyze",
+    },
+    { surface: "・", base: "・", reading: "・", pos: "記号", translation: "" },
+    {
+      surface: "翻訳",
+      base: "翻訳",
+      reading: "ホンヤク",
+      pos: "名詞",
+      translation: "translate",
+    },
+    {
+      surface: "でき",
+      base: "できる",
+      reading: "デキ",
+      pos: "動詞",
+      translation: "can",
+    },
+    {
+      surface: "ます",
+      base: "ます",
+      reading: "マス",
+      pos: "助動詞",
+      translation: "",
+    },
+    { surface: "。", base: "。", reading: "。", pos: "記号", translation: "" },
   ];
   const exampleTranslation =
     "You can analyze and translate Japanese on this site.";
@@ -75,26 +129,9 @@ export default function Page() {
     border: isDark ? "#444444" : "#cccccc",
     inputBg: isDark ? "#2a2a2a" : "#ffffff",
     buttonBg: isDark ? "#444444" : "#f0f0f0",
-    romanized: isDark ? "#66b3ff" : "#0066cc",
+    romanized: isDark ? "#ffffff" : "#0066cc",
     dimText: isDark ? "#999999" : "#666666",
   };
-  const selectedText = useMemo(
-    () =>
-      tokens
-        .filter((_, i) => selected.has(i))
-        .map((t) => t.surface)
-        .join(""),
-    [tokens, selected],
-  );
-
-  const selectedRomanized = useMemo(
-    () =>
-      tokens
-        .filter((_, i) => selected.has(i))
-        .map((t) => (t.reading ? hepburn.fromKana(t.reading) : t.surface))
-        .join(""),
-    [tokens, selected],
-  );
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -137,6 +174,7 @@ export default function Page() {
         color: colors.text,
         transition: "background-color 0.3s, color 0.3s",
       }}
+      className={sawarabiMincho.className}
     >
       <div style={{ width: "100%", maxWidth: 800, display: "grid", gap: 32 }}>
         <form
@@ -152,7 +190,6 @@ export default function Page() {
               border: `1px solid ${colors.border}`,
               borderRadius: 10,
               fontSize: 18,
-              fontFamily: "system-ui, -apple-system, sans-serif",
               flex: 1,
               backgroundColor: colors.inputBg,
               color: colors.text,
@@ -190,8 +227,8 @@ export default function Page() {
               style={{
                 display: "flex",
                 flexWrap: "wrap",
-                gap: 6,
-                fontSize: 18,
+                gap: 16,
+                fontSize: 26,
                 lineHeight: 1.8,
                 justifyContent: "center",
               }}
@@ -213,7 +250,6 @@ export default function Page() {
                       style={{
                         fontSize: 12,
                         color: colors.romanized,
-                        fontStyle: "italic",
                         fontWeight: 600,
                         letterSpacing: 0.5,
                         marginTop: 2,
@@ -227,6 +263,19 @@ export default function Page() {
                         .join(" | ")}
                     >
                       {t.romanized}
+                    </div>
+                  )}
+                  {t.translation && (
+                    <div
+                      style={{
+                        fontSize: 11,
+                        color: colors.dimText,
+                        fontWeight: 500,
+                        marginTop: 4,
+                        fontStyle: "italic",
+                      }}
+                    >
+                      {t.translation}
                     </div>
                   )}
                 </div>

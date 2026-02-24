@@ -52,16 +52,29 @@ export async function POST(req: Request) {
   const tokens = await tokenize(text);
 
   // Return only the fields you want on the client
-  const simplified = tokens.map((t) => ({
-    surface: t.surface_form,
-    base: t.basic_form,
-    reading: t.reading,
-    pronunciation: t.pronunciation,
-    pos: t.pos,
-    pos1: t.pos_detail_1,
-    pos2: t.pos_detail_2,
-    pos3: t.pos_detail_3,
-  }));
+  const simplified = await Promise.all(
+    tokens.map(async (t) => {
+      // Get translation for each token
+      const tokenText = t.surface_form;
+      const translation =
+        ["。", "、", "・", ",", "."].includes(tokenText) ||
+        tokenText.match(/^[ぁ-ん]$/)
+          ? ""
+          : await translateToEnglish(tokenText);
+
+      return {
+        surface: t.surface_form,
+        base: t.basic_form,
+        reading: t.reading,
+        pronunciation: t.pronunciation,
+        pos: t.pos,
+        pos1: t.pos_detail_1,
+        pos2: t.pos_detail_2,
+        pos3: t.pos_detail_3,
+        translation,
+      };
+    }),
+  );
 
   // Translate the entire text
   const fullTextTranslation = await translateToEnglish(text);
